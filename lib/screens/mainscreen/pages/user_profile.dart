@@ -93,7 +93,46 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ),
                     ),
                   ),
-                )
+                ),
+                Positioned(
+                  top: 200,
+                  left: 340,
+                  child: InkWell(
+                    onTap: () {},
+                    child: IconButton(
+                        onPressed: () {},
+                        icon: Container(
+                          height: 30,
+                          width: 30,
+                          decoration: const BoxDecoration(
+                              shape: BoxShape.circle, color: Colors.white),
+                          child: const Icon(
+                            Icons.photo_camera,
+                            size: 25,
+                          ),
+                        )),
+                  ),
+                ),
+                Positioned(
+                  top: 265,
+                  left: 160,
+                  child: InkWell(
+                    onTap: () {},
+                    child: IconButton(
+                        onPressed: () {},
+                        icon: Container(
+                          height: 30,
+                          width: 30,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color.fromARGB(255, 218, 210, 210)),
+                          child: Icon(
+                            Icons.photo_camera,
+                            size: 25,
+                          ),
+                        )),
+                  ),
+                ),
               ],
             ),
             const SizedBox(

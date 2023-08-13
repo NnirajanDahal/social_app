@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/models/user_model.dart';
 import '../../widgets/widgets.dart';
@@ -20,13 +21,12 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isObscure = true;
   bool _isClicked = false;
+  List<UserModel> userList = [];
   // bool _isLowercase = false;
   // bool _isOneDigit = false;
   // bool _isUpperCase = false;
   // bool _isOneSpecialCharacter = false;
   // bool _is8charactersLong = false;
-
-  List<UserModel> userList = [];
 
   Future<void> _loadUserData() async {
     setState(() async {
@@ -47,6 +47,41 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     });
   }
+
+  // Future<void> _fetchUserData() async {
+  //   try {
+  //     SharedPreferences prefs = await SharedPreferences.getInstance();
+  //     final jsonData = prefs.getString('dataList');
+  //     // log(jsonData.toString());
+
+  //     if (jsonData == null) {
+  //       String jsonData = await rootBundle.loadString('lib/services/user.json');
+  //       final jsonList = json.decode(jsonData);
+  //       //print(jsonList);
+  //       if (jsonList is List<dynamic>) {
+  //         userList = jsonList.map((json) => UserModel.fromMap(json)).toList();
+  //       } else if (jsonList is Map<String, dynamic>) {
+  //         userList.add(UserModel.fromMap(jsonList));
+  //       }
+  //       List jsonDataList = userList.map((e) => e.toMap()).toList();
+
+  //       String jsonDataString = json.encode(jsonDataList);
+  //       prefs.setString('dataList', jsonDataString);
+  //     }
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
+
+  // _fetchUserData() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   final jsonData = prefs.getString('userList');
+  //   if (jsonData == null) {
+  //     String jsonData = await rootBundle.loadString('lib/json/user.json');
+  //     final jsonList = json.decode(jsonData);
+  //     print(jsonList);
+  //   }
+  // }
 
   _login() async {
     try {
@@ -90,7 +125,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
+    // _fetchUserData();
     _loadUserData();
+
     super.initState();
   }
 

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:social_app/screens/auth/login_screen.dart';
 import 'package:social_app/screens/mainscreen/home_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // SharedPreferences pref = await SharedPreferences.getInstance();
   runApp(const MyApp());
 }
 

@@ -10,6 +10,7 @@ Widget textField({
   valiDator,
   inputformatters,
   borDer,
+  contentpadding,
 }) {
   return TextFormField(
     inputFormatters: inputformatters,
@@ -18,6 +19,7 @@ Widget textField({
     obscureText: obscuretext,
     controller: controller,
     decoration: InputDecoration(
+      contentPadding: contentpadding,
       border: borDer,
       hintText: hinttext,
       labelText: text,
