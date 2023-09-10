@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:social_app/widgets/widgets.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -9,7 +12,84 @@ class UserProfileScreen extends StatefulWidget {
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
-  final TextEditingController _searchController = TextEditingController();
+  // final TextEditingController _searchController = TextEditingController();
+  XFile? pickCoverImage;
+  XFile? pickProfileImage;
+
+  _pickCoverImage(ImageSource imageSource) async {
+    final ImagePicker picker = ImagePicker();
+    XFile? image = await picker.pickImage(source: imageSource);
+    if (image != null) {
+      setState(() {
+        pickCoverImage = XFile(image.path);
+      });
+    }
+
+    Navigator.pop(context);
+  }
+
+  _pickProfileImage(ImageSource imageSource) async {
+    final ImagePicker picker = ImagePicker();
+    XFile? image = await picker.pickImage(source: imageSource);
+    if (image != null) {
+      setState(() {
+        pickProfileImage = XFile(image.path);
+      });
+    }
+
+    Navigator.pop(context);
+  }
+
+  _handleCoverImage() async {
+    showModalBottomSheet(
+      context: context,
+      builder: ((context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              onTap: () {
+                _pickCoverImage(ImageSource.camera);
+              },
+              title: const Text("Camera "),
+            ),
+            ListTile(
+              onTap: () {
+                _pickCoverImage(ImageSource.gallery);
+              },
+              title: const Text("Gallery "),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+
+  _handleProfileImage() async {
+    showModalBottomSheet(
+      context: context,
+      builder: ((context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              onTap: () {
+                _pickProfileImage(ImageSource.camera);
+              },
+              title: const Text("Camera "),
+            ),
+            ListTile(
+              onTap: () {
+                _pickProfileImage(ImageSource.gallery);
+              },
+              title: const Text("Gallery "),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,25 +106,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // const SizedBox(
-            //   height: 50,
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 20),
-            //   child: textField(
-            //       prefixicon: const Icon(Icons.search),
-            //       hinttext: "Search",
-            //       controller: _searchController,
-            //       borDer: const OutlineInputBorder(
-            //           borderRadius: BorderRadius.all(Radius.circular(50)))),
-            // ),
-            // const SizedBox(
-            //   height: 5,
-            // ),
-            // const Divider(),
-            // const SizedBox(
-            //   height: 1,
-            // ),
             Stack(
               clipBehavior: Clip.none,
               children: [
@@ -58,17 +119,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         color: Colors.grey.withOpacity(0.5),
                         spreadRadius: 5,
                         blurRadius: 7,
-                        offset: const Offset(
-                            0, 3), // changes the position of the shadow
+                        offset: const Offset(0, 3),
                       ),
                     ],
                   ),
-                  child: Image.network(
-                    "https://imgs.search.brave.com/Ysr9JoSKvDfi9oGY-bGj2jKwZl_Lo3oG3MZUqZebkeM/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudW5zcGxhc2gu/Y29tL3Bob3RvLTE2/NDE2NjM1NzM0MTUt/ZjYyMTFhOWIwMDQ3/P2l4bGliPXJiLTQu/MC4zJml4aWQ9TTN3/eE1qQTNmREI4TUh4/elpXRnlZMmg4T1h4/OFpHOW5KVEl3Y0ds/amRIVnlaWHhsYm53/d2ZId3dmSHg4TUE9/PSZ3PTEwMDAmcT04/MA.jpeg",
-                    height: double.infinity,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+
+                  //Cover Image
+                  child: pickCoverImage != null
+                      ? Image.file(
+                          File(pickCoverImage!.path),
+                          fit: BoxFit.cover,
+                        )
+                      : const Center(child: Text("No Image")),
                 ),
                 Positioned(
                   top: 125,
@@ -85,53 +147,57 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       width: 100,
                       decoration: const BoxDecoration(
                           shape: BoxShape.circle, color: Colors.white),
-                      child: const CircleAvatar(
-                        // backgroundColor: Colors.blue,
-                        radius: 50,
-                        backgroundImage: NetworkImage(
-                            "https://imgs.search.brave.com/jH07hakOqODDY4DUpMCriStNajqSddPFdNYUEd5VjmA/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudW5zcGxhc2gu/Y29tL3Bob3RvLTE1/MzQzNTE0NTAxODEt/ZWE5Zjc4NDI3ZmU4/P2l4bGliPXJiLTQu/MC4zJml4aWQ9TTN3/eE1qQTNmREI4TUh4/elpXRnlZMmg4TVRK/OGZHUnZaM044Wlc1/OE1IeDhNSHg4ZkRB/PSZ3PTEwMDAmcT04/MA.jpeg"),
-                      ),
+                      child: pickProfileImage != null
+                          ? CircleAvatar(
+                              radius: 50,
+
+                              //Profile Image
+                              backgroundImage: FileImage(
+                                File(pickProfileImage!.path),
+                              ))
+                          : const Center(child: Text("No image")),
                     ),
                   ),
                 ),
                 Positioned(
                   top: 200,
                   left: 340,
-                  child: InkWell(
-                    onTap: () {},
-                    child: IconButton(
-                        onPressed: () {},
-                        icon: Container(
-                          height: 30,
-                          width: 30,
-                          decoration: const BoxDecoration(
-                              shape: BoxShape.circle, color: Colors.white),
-                          child: const Icon(
-                            Icons.photo_camera,
-                            size: 25,
-                          ),
-                        )),
-                  ),
+                  child: IconButton(
+
+                      //Select Cover Image
+                      onPressed: () {
+                        _handleCoverImage();
+                      },
+                      icon: Container(
+                        height: 30,
+                        width: 30,
+                        decoration: const BoxDecoration(
+                            shape: BoxShape.circle, color: Colors.white),
+                        child: const Icon(
+                          Icons.photo_camera,
+                          size: 25,
+                        ),
+                      )),
                 ),
                 Positioned(
-                  top: 265,
-                  left: 160,
-                  child: InkWell(
-                    onTap: () {},
-                    child: IconButton(
-                        onPressed: () {},
-                        icon: Container(
-                          height: 30,
-                          width: 30,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: const Color.fromARGB(255, 218, 210, 210)),
-                          child: Icon(
-                            Icons.photo_camera,
-                            size: 25,
-                          ),
-                        )),
-                  ),
+                  top: 200,
+                  left: 185,
+                  child: IconButton(
+
+                      //Select Cover Image
+                      onPressed: () {
+                        _handleProfileImage();
+                      },
+                      icon: Container(
+                        height: 30,
+                        width: 30,
+                        decoration: const BoxDecoration(
+                            shape: BoxShape.circle, color: Colors.white),
+                        child: const Icon(
+                          Icons.photo_camera,
+                          size: 25,
+                        ),
+                      )),
                 ),
               ],
             ),

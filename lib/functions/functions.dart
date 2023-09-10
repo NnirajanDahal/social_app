@@ -1,19 +1,13 @@
-import 'package:flutter/cupertino.dart';
+int likesCount = 0;
 
-class CountLikes {
-  List<int> likesCount = [0];
+likesIncrement() {
+  likesCount++;
+}
 
-  likesIncrement() {
-    int last = likesCount.last;
-    likesCount.add(last + 1);
-  }
-
-  void decrement() {
-    int last = likesCount.last;
-    if (last > 0) {
-      likesCount.remove(last);
-    } else if (last == 0) {
-      Text("No likes");
-    }
+likesDecrement() {
+  if (likesCount > 0) {
+    likesCount--;
+  } else {
+    likesCount == 0;
   }
 }

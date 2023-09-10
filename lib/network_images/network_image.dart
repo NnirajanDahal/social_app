@@ -1,4 +1,4 @@
-final List<String> stories = [
+List<String> stories = [
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbR4n6lzmBoQRRGCjICBBU7g5m4FSl_rniwg&usqp=CAU",
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJcIGHtZDtIFsYWprxLEXx-yrX8KS7Kw28HB_U7MyunH5lNjdfxwNm_-kodaVjoqRZZ-E&usqp=CAU",
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk-mwOEtXZ0ZGE7y8m1HunWUnvbjvWs3S208wBpOzOCZas00hpZ-K3xKV9njuar_WvEBI&usqp=CAU",
@@ -53,7 +53,7 @@ final List<String> stories = [
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXRvUBtumSw6XlzUX71fhs3hcSqe2Crm2bqQ&usqp=CAU",
 ];
 
-final List<String> feeds = [
+List<String> feeds = [
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbR4n6lzmBoQRRGCjICBBU7g5m4FSl_rniwg&usqp=CAU",
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJcIGHtZDtIFsYWprxLEXx-yrX8KS7Kw28HB_U7MyunH5lNjdfxwNm_-kodaVjoqRZZ-E&usqp=CAU",
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk-mwOEtXZ0ZGE7y8m1HunWUnvbjvWs3S208wBpOzOCZas00hpZ-K3xKV9njuar_WvEBI&usqp=CAU",
@@ -160,6 +160,60 @@ List<String> randomNames = [
   "Isaac Mitchell",
   "Samantha Jenkins",
   "Nathan Wright"
+      "Nathan Wright"
 ];
 
-List<String> caption = ["Lorem Ipsum"];
+List<String> caption = [
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+  "Lorem Ipsum",
+];

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/models/user_model.dart';
 import '../../widgets/widgets.dart';
@@ -106,8 +105,10 @@ class _LoginScreenState extends State<LoginScreen> {
       await Future.delayed(const Duration(seconds: 1));
 
       // ignore: use_build_context_synchronously
-      Navigator.push(context,
-          CupertinoPageRoute(builder: ((context) => const HomePage())));
+      Navigator.pushAndRemoveUntil(
+          context,
+          CupertinoPageRoute(builder: (context) => const HomePage()),
+          (route) => false);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Account doesn't exists"),
@@ -173,54 +174,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (value.isEmpty) {
                       return "Invalid password";
                     }
-                    // if (value.length > 7) {
-                    //   setState(() {
-                    //     _is8charactersLong = true;
-                    //   });
-                    // } else {
-                    //   setState(() {
-                    //     _is8charactersLong = false;
-                    //   });
-                    // }
-
-                    // if (value.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'))) {
-                    //   setState(() {
-                    //     _isOneSpecialCharacter = true;
-                    //   });
-                    // } else {
-                    //   setState(() {
-                    //     _isOneSpecialCharacter = false;
-                    //   });
-                    // }
-
-                    // if (value.contains(RegExp(r'[A-Z]'))) {
-                    //   setState(() {
-                    //     _isUpperCase = true;
-                    //   });
-                    // } else {
-                    //   setState(() {
-                    //     _isUpperCase = false;
-                    //   });
-                    // }
-                    // if (value.contains(RegExp(r'[a-z]'))) {
-                    //   setState(() {
-                    //     _isLowercase = true;
-                    //   });
-                    // } else {
-                    //   setState(() {
-                    //     _isLowercase = false;
-                    //   });
-                    // }
-
-                    // if (value.contains(RegExp(r'[0-9]'))) {
-                    //   setState(() {
-                    //     _isOneDigit = true;
-                    //   });
-                    // } else {
-                    //   setState(() {
-                    //     _isOneDigit = false;
-                    //   });
-                    // }
                   },
                   obscuretext: _isObscure,
                   text: "Password",

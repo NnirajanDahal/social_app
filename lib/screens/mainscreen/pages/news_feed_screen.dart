@@ -1,6 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/functions/functions.dart';
-import 'package:social_app/widgets/widgets.dart';
+import 'package:social_app/screens/mainscreen/pages/add_post_screen.dart';
 
 import '../../../network_images/network_image.dart';
 
@@ -12,8 +13,7 @@ class NewsFeedScreen extends StatefulWidget {
 }
 
 class _NewsFeedScreenState extends State<NewsFeedScreen> {
-  final TextEditingController _statusController = TextEditingController();
-  final TextEditingController _storiesController = TextEditingController();
+  bool likeButtonPressed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -65,15 +65,46 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                       "https://imgs.search.brave.com/jH07hakOqODDY4DUpMCriStNajqSddPFdNYUEd5VjmA/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudW5zcGxhc2gu/Y29tL3Bob3RvLTE1/MzQzNTE0NTAxODEt/ZWE5Zjc4NDI3ZmU4/P2l4bGliPXJiLTQu/MC4zJml4aWQ9TTN3/eE1qQTNmREI4TUh4/elpXRnlZMmg4TVRK/OGZHUnZaM044Wlc1/OE1IeDhNSHg4ZkRB/PSZ3PTEwMDAmcT04/MA.jpeg",
                       height: 50,
                       width: 50,
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
-                Expanded(
-                  child: textField(
-                      borDer: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30)),
-                      controller: _statusController,
-                      hinttext: "What's on your mind?"),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                            builder: (context) => const AddPostPage()));
+                  },
+                  child: Expanded(
+                      child: Container(
+                    height: 40,
+                    width: 275,
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 255, 255, 255),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                        child: Row(
+                      children: [
+                        SizedBox(
+                          width: 15,
+                        ),
+                        Text(
+                          "What's on your mind?",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ],
+                    )),
+                  )),
                 ),
                 IconButton(
                     onPressed: () {},
@@ -136,7 +167,6 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                     ),
                     Expanded(
                       child: ListView.builder(
-                        // physics: NeverScrollableScrollPhysics(),
                         scrollDirection: Axis.horizontal,
                         itemCount: stories.length,
                         itemBuilder: (context, index) {
@@ -199,80 +229,98 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                ClipOval(
-                                  child: Image.network(
-                                    feeds[index],
-                                    height: 50,
-                                    width: 50,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                Row(
                                   children: [
-                                    Text(
-                                      randomNames[index],
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
+                                    ClipOval(
+                                      child: Image.network(
+                                        feeds[index],
+                                        height: 50,
+                                        width: 50,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
-                                    const Row(
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Text("3d "),
-                                        Icon(
-                                          Icons.public,
-                                          size: 15,
+                                        Text(
+                                          randomNames[index],
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18),
+                                        ),
+                                        const Row(
+                                          children: [
+                                            Text("3d "),
+                                            Icon(
+                                              Icons.public,
+                                              size: 15,
+                                            )
+                                          ],
                                         )
                                       ],
-                                    )
+                                    ),
                                   ],
                                 ),
-                                const SizedBox(
-                                  width: 82,
-                                ),
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      IconButton(
+                                // const SizedBox(
+                                //   width: 82,
+                                // ),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(Icons.more_horiz),
+                                    ),
+                                    IconButton(
                                         onPressed: () {},
-                                        icon: const Icon(Icons.more_horiz),
-                                      ),
-                                      IconButton(
-                                          onPressed: () {},
-                                          icon: const Icon(Icons.clear))
-                                    ],
-                                  ),
+                                        icon: const Icon(Icons.clear))
+                                  ],
                                 )
                               ],
                             ),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 2),
-                              child: Text(""),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 2),
+                              child: Text(caption[index]),
                             ),
                             Image.network(
                               feeds[index],
                               height: 350,
                               fit: BoxFit.cover,
                             ),
+                            const SizedBox(
+                              height: 10,
+                            ),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(
+                                Row(
+                                  children: [
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    const Icon(
                                       Icons.thumb_up_sharp,
                                       color: Colors.blue,
-                                    )),
-                                const Text(
-                                  "Likes",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      likesCount.toString(),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(
-                                  width: 220,
-                                ),
+                                // const SizedBox(
+                                //   width: 220,
+                                // ),
                                 const Text("comments")
                               ],
                             ),
@@ -282,10 +330,26 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                               children: [
                                 Row(
                                   children: [
-                                    IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(
-                                            Icons.thumb_up_alt_sharp)),
+                                    likeButtonPressed
+                                        ? IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                likeButtonPressed = true;
+                                              });
+                                            },
+                                            icon: const Icon(
+                                              Icons.thumb_up_alt_sharp,
+                                              color: Colors.blue,
+                                            ))
+                                        : IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                likeButtonPressed = false;
+                                              });
+                                            },
+                                            icon: const Icon(
+                                              Icons.thumb_up_alt_sharp,
+                                            )),
                                     const Text("Like"),
                                   ],
                                 ),
