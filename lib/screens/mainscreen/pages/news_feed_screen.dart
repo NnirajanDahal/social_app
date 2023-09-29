@@ -1,6 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app/functions/functions.dart';
+import 'package:social_app/helpers/base64Convert.dart';
+import 'package:social_app/helpers/post_helper.dart';
+import 'package:social_app/models/post_model.dart';
+import 'package:social_app/screens/auth/login_screen.dart';
 import 'package:social_app/screens/mainscreen/pages/add_post_screen.dart';
 
 import '../../../network_images/network_image.dart';
@@ -14,6 +21,28 @@ class NewsFeedScreen extends StatefulWidget {
 
 class _NewsFeedScreenState extends State<NewsFeedScreen> {
   bool likeButtonPressed = false;
+
+  List<PostModel> posts = [];
+  retrievePosts() async {
+    final retrievedPosts = await PostManager.getPosts();
+
+    setState(() {
+      posts = retrievedPosts;
+    });
+  }
+
+  handleLogout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('loggedIn', false);
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => LoginScreen()));
+  }
+
+  @override
+  void initState() {
+    retrievePosts();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,12 +70,29 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
             ),
           ),
           IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.messenger_outline_rounded,
-              size: 30,
-            ),
-          ),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('Logout'),
+                    content: Text('Are you sure want to logout?.'),
+                    actions: <Widget>[
+                      TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('No')),
+                      TextButton(
+                        onPressed: () {
+                          handleLogout();
+                        },
+                        child: Text('Yes'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              icon: Icon(Icons.logout, size: 30)),
           const SizedBox(
             width: 10,
           ),
@@ -206,12 +252,12 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
               height: 600,
               child: Expanded(
                 child: ListView.builder(
-                  itemCount: stories.length,
+                  itemCount: posts.length,
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 7),
                       child: Container(
-                        height: 550,
+                        // height: 550,
                         decoration: BoxDecoration(
                           color: const Color.fromARGB(255, 241, 239, 239),
                           // borderRadius: BorderRadius.circular(10),
@@ -234,8 +280,11 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                                 Row(
                                   children: [
                                     ClipOval(
-                                      child: Image.network(
-                                        feeds[index],
+                                      child: Image.memory(
+                                        base64Decode(
+                                          posts[index].image ??
+                                              base64Image.imageString,
+                                        ),
                                         height: 50,
                                         width: 50,
                                         fit: BoxFit.cover,
@@ -249,10 +298,10 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          randomNames[index],
+                                          posts[index].postDate.toString(),
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold,
-                                              fontSize: 18),
+                                              fontSize: 10),
                                         ),
                                         const Row(
                                           children: [
@@ -286,12 +335,16 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 2),
-                              child: Text(caption[index]),
+                              child: Text(posts[index].postContent ?? ""),
                             ),
-                            Image.network(
-                              feeds[index],
-                              height: 350,
-                              fit: BoxFit.cover,
+                            Center(
+                              child: Image.memory(
+                                base64Decode(
+                                  posts[index].image ?? base64Image.imageString,
+                                ),
+                                height: 300,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                             const SizedBox(
                               height: 10,
@@ -326,52 +379,59 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                             ),
                             const Divider(),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              // mainAxisAlignment:
+                              //     MainAxisAlignment.spaceBetween,
                               children: [
-                                Row(
-                                  children: [
-                                    likeButtonPressed
-                                        ? IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                likeButtonPressed = true;
-                                              });
-                                            },
-                                            icon: const Icon(
-                                              Icons.thumb_up_alt_sharp,
-                                              color: Colors.blue,
-                                            ))
-                                        : IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                likeButtonPressed = false;
-                                              });
-                                            },
-                                            icon: const Icon(
-                                              Icons.thumb_up_alt_sharp,
-                                            )),
-                                    const Text("Like"),
-                                  ],
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      likeButtonPressed
+                                          ? IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  likeButtonPressed = true;
+                                                });
+                                              },
+                                              icon: const Icon(
+                                                Icons.thumb_up_alt_sharp,
+                                                color: Colors.blue,
+                                              ))
+                                          : IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  likeButtonPressed = false;
+                                                });
+                                              },
+                                              icon: const Icon(
+                                                Icons.thumb_up_alt_sharp,
+                                              )),
+                                      const Text("Like"),
+                                    ],
+                                  ),
                                 ),
-                                Row(
-                                  children: [
-                                    IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(Icons.comment)),
-                                    const Text("Comment"),
-                                  ],
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      IconButton(
+                                          onPressed: () {},
+                                          icon: const Icon(Icons.comment)),
+                                      const Text("Comment"),
+                                    ],
+                                  ),
                                 ),
-                                Row(
-                                  children: [
-                                    IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(Icons.messenger)),
-                                    const Text("Message")
-                                  ],
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      IconButton(
+                                          onPressed: () {},
+                                          icon: const Icon(Icons.messenger)),
+                                      const Text("Message")
+                                    ],
+                                  ),
                                 )
                               ],
                             ),
-                            const Divider()
+                            const Divider(),
                           ],
                         ),
                       ),

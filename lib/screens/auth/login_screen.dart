@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:social_app/helpers/user_helper.dart';
 import 'package:social_app/models/user_model.dart';
+import 'package:social_app/screens/mainscreen/pages/news_feed_screen.dart';
 import '../../widgets/widgets.dart';
 import '../mainscreen/home_screen.dart';
 import 'signup_screen.dart';
@@ -16,8 +18,10 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  // final TextEditingController _emailController = TextEditingController();
+  // final TextEditingController _passwordController = TextEditingController();
   bool _isObscure = true;
   bool _isClicked = false;
   List<UserModel> userList = [];
@@ -26,109 +30,50 @@ class _LoginScreenState extends State<LoginScreen> {
   // bool _isUpperCase = false;
   // bool _isOneSpecialCharacter = false;
   // bool _is8charactersLong = false;
+  void checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool loggedIn = prefs.getBool('loggedIn') ?? false;
 
-  Future<void> _loadUserData() async {
-    setState(() async {
-      SharedPreferences pref = await SharedPreferences.getInstance();
-      String prefData = pref.getString("userData") ?? "";
-      if (prefData.isNotEmpty || prefData != "") {
-        List mapData = (json.decode(prefData) as List<dynamic>)
-            .map((e) => UserModel.fromMap(e))
-            .toList();
-        // print(prefData);
-        if (mapData.isNotEmpty) {
-          for (var i in mapData) {
-            setState(() {
-              userList.add(i);
-            });
-          }
-        }
-      }
-    });
-  }
-
-  // Future<void> _fetchUserData() async {
-  //   try {
-  //     SharedPreferences prefs = await SharedPreferences.getInstance();
-  //     final jsonData = prefs.getString('dataList');
-  //     // log(jsonData.toString());
-
-  //     if (jsonData == null) {
-  //       String jsonData = await rootBundle.loadString('lib/services/user.json');
-  //       final jsonList = json.decode(jsonData);
-  //       //print(jsonList);
-  //       if (jsonList is List<dynamic>) {
-  //         userList = jsonList.map((json) => UserModel.fromMap(json)).toList();
-  //       } else if (jsonList is Map<String, dynamic>) {
-  //         userList.add(UserModel.fromMap(jsonList));
-  //       }
-  //       List jsonDataList = userList.map((e) => e.toMap()).toList();
-
-  //       String jsonDataString = json.encode(jsonDataList);
-  //       prefs.setString('dataList', jsonDataString);
-  //     }
-  //   } catch (e) {
-  //     rethrow;
-  //   }
-  // }
-
-  // _fetchUserData() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   final jsonData = prefs.getString('userList');
-  //   if (jsonData == null) {
-  //     String jsonData = await rootBundle.loadString('lib/json/user.json');
-  //     final jsonList = json.decode(jsonData);
-  //     print(jsonList);
-  //   }
-  // }
-
-  _login() async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      UserModel users = userList.firstWhere((user) =>
-          user.email == _emailController.text &&
-          user.password == _passwordController.text);
-      prefs.setString('userEmail', users.email);
-      if (_formKey.currentState!.validate()
-          //  &&
-          //     _isUpperCase == true &&
-          //     _isLowercase == true &&
-          //     _is8charactersLong == true &&
-          //     _isOneDigit == true &&
-          //     _isOneSpecialCharacter == true
-          ) {
-        setState(() {
-          _isClicked = true;
-        });
-      }
-
-      await Future.delayed(const Duration(seconds: 1));
-
-      // ignore: use_build_context_synchronously
-      Navigator.pushAndRemoveUntil(
-          context,
-          CupertinoPageRoute(builder: (context) => const HomePage()),
-          (route) => false);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Account doesn't exists"),
-        backgroundColor: Colors.red,
-      ));
+    if (loggedIn) {
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => NewsFeedScreen()));
     }
   }
 
-  Future<void> removeDataFromSharedPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      prefs.remove('userData');
-    });
+  handleLogin() async {
+    String enteredUsername = usernameController.text;
+    String enteredPassword = passwordController.text;
+    UserModel? retrievedUser = await SharedPreferencesUserHelper.getUserModel();
+    if (enteredUsername == retrievedUser?.email &&
+        enteredPassword == retrievedUser?.password) {
+      // Successful login
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('loggedIn', true);
+      // log(retrievedUser!.userId);
+
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => NewsFeedScreen()));
+    } else {
+      //  Invalid credentials
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text('Invalid username or password.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
   void initState() {
-    // _fetchUserData();
-    _loadUserData();
-
+    checkLoginStatus();
     super.initState();
   }
 
@@ -163,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     return "Invalid Email";
                   },
                   text: "Email",
-                  controller: _emailController,
+                  controller: usernameController,
                   prefixicon: const Icon(Icons.email),
                 ),
                 const SizedBox(
@@ -177,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   obscuretext: _isObscure,
                   text: "Password",
-                  controller: _passwordController,
+                  controller: passwordController,
                   prefixicon: const Icon(Icons.key),
                   suffixicon: IconButton(
                     onPressed: () {
@@ -189,106 +134,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         _isObscure ? Icons.visibility : Icons.visibility_off),
                   ),
                 ),
-                // Row(
-                //   children: [
-                //     const Text("-"),
-                //     Text(
-                //       "  uppercase letter",
-                //       style: TextStyle(
-                //           fontSize: 11,
-                //           color: _isUpperCase ? Colors.green : Colors.red),
-                //     ),
-                //     _isUpperCase
-                //         ? const Icon(
-                //             Icons.done,
-                //             size: 13,
-                //             color: Colors.green,
-                //           )
-                //         : const SizedBox()
-                //   ],
-                // ),
-                // Row(
-                //   children: [
-                //     const Text("-"),
-                //     Text(
-                //       "  lowercase letter",
-                //       style: TextStyle(
-                //           fontSize: 11,
-                //           color: _isLowercase ? Colors.green : Colors.red),
-                //     ),
-                //     _isLowercase
-                //         ? const Icon(
-                //             Icons.done,
-                //             size: 13,
-                //             color: Colors.green,
-                //           )
-                //         : const SizedBox()
-                //   ],
-                // ),
-                // Row(
-                //   children: [
-                //     const Text("-"),
-                //     Text(
-                //       "  at least one digit",
-                //       style: TextStyle(
-                //           fontSize: 11,
-                //           color: _isOneDigit ? Colors.green : Colors.red),
-                //     ),
-                //     _isOneDigit
-                //         ? const Icon(
-                //             Icons.done,
-                //             size: 13,
-                //             color: Colors.green,
-                //           )
-                //         : const SizedBox()
-                //   ],
-                // ),
-                // Row(
-                //   children: [
-                //     const Text("-"),
-                //     Text(
-                //       "  one special character",
-                //       style: TextStyle(
-                //           fontSize: 11,
-                //           color: _isOneSpecialCharacter
-                //               ? Colors.green
-                //               : Colors.red),
-                //     ),
-                //     _isOneSpecialCharacter
-                //         ? const Icon(
-                //             Icons.done,
-                //             size: 13,
-                //             color: Colors.green,
-                //           )
-                //         : const SizedBox()
-                //   ],
-                // ),
-                // Row(
-                //   children: [
-                //     const Text("-"),
-                //     Text(
-                //       "  8 characters long",
-                //       style: TextStyle(
-                //           fontSize: 11,
-                //           color:
-                //               _is8charactersLong ? Colors.green : Colors.red),
-                //     ),
-                //     _is8charactersLong
-                //         ? const Icon(
-                //             Icons.done,
-                //             size: 13,
-                //             color: Colors.green,
-                //           )
-                //         : const SizedBox()
-                //   ],
-                // ),
+
                 const SizedBox(
                   height: 50,
                 ),
                 InkWell(
                   onTap: () {
                     if (_formKey.currentState!.validate()) {
-                      _login();
+                      handleLogin();
                     }
                   },
                   child: AnimatedContainer(

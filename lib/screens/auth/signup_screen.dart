@@ -1,11 +1,14 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:social_app/helpers/user_helper.dart';
 import 'package:social_app/models/user_model.dart';
 import 'package:social_app/screens/auth/login_screen.dart';
+import 'package:uuid/uuid.dart';
 import '../../widgets/widgets.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -16,10 +19,13 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  // final TextEditingController firstNameController = TextEditingController();
+  // final TextEditingController lastNameController = TextEditingController();
+  // final TextEditingController emailController = TextEditingController();
+  // final TextEditingController passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isObscure = true;
   bool _isLowercase = false;
@@ -28,35 +34,65 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _isOneSpecialCharacter = false;
   bool _is8charactersLong = false;
 
-  void _saveUserData() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    List<UserModel> userList = [];
-    UserModel userData = UserModel(
-        firstName: firstNameController.text.toString(),
-        lastName: lastNameController.text.toString(),
-        email: emailController.text.toString(),
-        password: passwordController.text.toString());
-    String prefData = pref.getString("userData") ?? "";
-    // print(prefData);
-    if (prefData.isNotEmpty || prefData != "") {
-      setState(() {
-        List mapData = (json.decode(prefData) as List<dynamic>)
-            .map((e) => UserModel.fromMap(e))
-            .toList();
-        if (mapData.isNotEmpty) {
-          for (var i in mapData) {
-            userList.add(i);
-          }
-        }
-      });
-    }
-    setState(() async {
-      userList.add(userData);
-      String setData =
-          json.encode(userList.map((item) => item.toMap()).toList());
+  handleSignUp() async {
+    String enteredEmail = usernameController.text;
+    String enteredPassword = passwordController.text;
+    UserModel? retrievedUser = await SharedPreferencesUserHelper.getUserModel();
 
-      await pref.setString('userData', setData);
-    });
+    if (enteredEmail.isNotEmpty && enteredPassword.isNotEmpty) {
+      if (enteredEmail == retrievedUser?.email) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('User already exists'),
+            content: Text('Go to login page?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('No'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => LoginScreen())),
+                child: Text('Yes'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        final dynamic uuid = Uuid();
+        final String userId = uuid.v4();
+        log(userId.toString());
+        UserModel user = UserModel(
+          userId: userId,
+          email: enteredEmail,
+          password: enteredPassword,
+        );
+        SharedPreferencesUserHelper.saveUserModel(user);
+        log(user.userId);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            duration: Duration(seconds: 3),
+            backgroundColor: Colors.green,
+            content: Text("User created successfully")));
+
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => LoginScreen()));
+      }
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text('Please fill in all fields.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
@@ -72,43 +108,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(
                   height: 100,
                 ),
-                textField(
-                  prefixicon: const Icon(Icons.keyboard),
-                  text: "First Name",
-                  controller: firstNameController,
-                  valiDator: (value) {
-                    if (value!.length > 10) {
-                      return "Not >10 char";
-                    } else if (value.isEmpty) {
-                      return "Required";
-                    }
-                  },
-                  inputformatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r"^[a-z A-Z]+$")),
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                textField(
-                  prefixicon: const Icon(Icons.keyboard),
-                  text: "Last Name",
-                  controller: lastNameController,
-                  valiDator: (value) {
-                    if (value!.length > 10) {
-                      return "Not >10 char";
-                    } else if (value.isEmpty) {
-                      return "Required";
-                    }
-                  },
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
+                // textField(
+                //   prefixicon: const Icon(Icons.keyboard),
+                //   text: "First Name",
+                //   controller: firstNameController,
+                //   valiDator: (value) {
+                //     if (value!.length > 10) {
+                //       return "Not >10 char";
+                //     } else if (value.isEmpty) {
+                //       return "Required";
+                //     }
+                //   },
+                //   inputformatters: [
+                //     FilteringTextInputFormatter.allow(RegExp(r"^[a-z A-Z]+$")),
+                //   ],
+                // ),
+                // const SizedBox(
+                //   height: 10,
+                // ),
+                // textField(
+                //   prefixicon: const Icon(Icons.keyboard),
+                //   text: "Last Name",
+                //   controller: lastNameController,
+                //   valiDator: (value) {
+                //     if (value!.length > 10) {
+                //       return "Not >10 char";
+                //     } else if (value.isEmpty) {
+                //       return "Required";
+                //     }
+                //   },
+                // ),
+                // const SizedBox(
+                //   height: 10,
+                // ),
                 textField(
                   prefixicon: const Icon(Icons.email),
                   text: "Email",
-                  controller: emailController,
+                  controller: usernameController,
                   valiDator: (value) {
                     if (value != null &&
                         RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
@@ -290,11 +326,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           _is8charactersLong == true &&
                           _isOneDigit == true &&
                           _isOneSpecialCharacter == true) {
+                        handleSignUp();
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                                 backgroundColor: Colors.red,
                                 content: Text("User created successfully")));
-                        _saveUserData();
 
                         Navigator.push(
                             context,
