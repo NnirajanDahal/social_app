@@ -31,6 +31,17 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
     });
   }
 
+  deletePost(int index) async {
+    final List<PostModel> existingPosts = await PostManager.getPosts();
+    if (index >= 0 && index < existingPosts.length) {
+      existingPosts.removeAt(index);
+      await PostManager.savePosts(existingPosts);
+      setState(() {
+        posts = existingPosts;
+      });
+    }
+  }
+
   handleLogout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('loggedIn', false);
@@ -153,7 +164,12 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                   )),
                 ),
                 IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AddPostPage()));
+                    },
                     icon: const Icon(
                       Icons.photo,
                       color: Colors.green,
@@ -214,30 +230,37 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                     Expanded(
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        itemCount: stories.length,
+                        itemCount: posts.length,
                         itemBuilder: (context, index) {
-                          return Container(
-                              height: 200,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 5, vertical: 5),
-                              margin: const EdgeInsets.symmetric(horizontal: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.grey,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.white.withOpacity(0.5),
-                                    spreadRadius: 5,
-                                    blurRadius: 7,
-                                    offset: const Offset(0, 3),
+                          return posts[index].image != null
+                              ? Container(
+                                  height: 200,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 5, vertical: 5),
+                                  margin:
+                                      const EdgeInsets.symmetric(horizontal: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.white.withOpacity(0.5),
+                                        spreadRadius: 5,
+                                        blurRadius: 7,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                              width: 100,
-                              child: Image.network(
-                                stories[index],
-                                fit: BoxFit.cover,
-                              ));
+                                  width: 100,
+                                  child: Image.memory(
+                                    base64Decode(
+                                      posts[index].image ??
+                                          base64Image.imageString,
+                                    ),
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : SizedBox();
                         },
                       ),
                     ),
@@ -254,192 +277,250 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                 child: ListView.builder(
                   itemCount: posts.length,
                   itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 7),
-                      child: Container(
-                        // height: 550,
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 241, 239, 239),
-                          // borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color.fromARGB(255, 182, 178, 178)
-                                  .withOpacity(0.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    return posts[index].image == null &&
+                            posts[index].postContent == null
+                        ? SizedBox()
+                        : Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 7),
+                            child: Column(
                               children: [
-                                Row(
-                                  children: [
-                                    ClipOval(
-                                      child: Image.memory(
-                                        base64Decode(
-                                          posts[index].image ??
-                                              base64Image.imageString,
-                                        ),
-                                        height: 50,
-                                        width: 50,
-                                        fit: BoxFit.cover,
+                                Container(
+                                  // height: 550,
+                                  decoration: BoxDecoration(
+                                    color: const Color.fromARGB(
+                                        255, 241, 239, 239),
+                                    // borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color.fromARGB(
+                                                255, 182, 178, 178)
+                                            .withOpacity(0.5),
+                                        spreadRadius: 5,
+                                        blurRadius: 7,
+                                        offset: const Offset(0, 3),
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          posts[index].postDate.toString(),
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 10),
-                                        ),
-                                        const Row(
-                                          children: [
-                                            Text("3d "),
-                                            Icon(
-                                              Icons.public,
-                                              size: 15,
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              ClipOval(
+                                                child: Image.memory(
+                                                  base64Decode(
+                                                    posts[index].image ??
+                                                        base64Image.imageString,
+                                                  ),
+                                                  height: 50,
+                                                  width: 50,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    posts[index]
+                                                        .postDate
+                                                        .toString(),
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 10),
+                                                  ),
+                                                  const Row(
+                                                    children: [
+                                                      Text("3d "),
+                                                      Icon(
+                                                        Icons.public,
+                                                        size: 15,
+                                                      )
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          // const SizedBox(
+                                          //   width: 82,
+                                          // ),
+                                          Row(
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {},
+                                                icon: const Icon(
+                                                    Icons.more_horiz),
+                                              ),
+                                              IconButton(
+                                                  onPressed: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (context) =>
+                                                          AlertDialog(
+                                                        title: Text('ALERT!'),
+                                                        content: Text(
+                                                            'Sure want to delete?'),
+                                                        actions: <Widget>[
+                                                          TextButton(
+                                                            onPressed: () =>
+                                                                Navigator.pop(
+                                                                    context),
+                                                            child: Text('No'),
+                                                          ),
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              deletePost(index);
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            child: Text('Yes'),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                  icon: const Icon(Icons.clear))
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                      posts[index].postContent != null
+                                          ? Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 2),
+                                              child: Text(
+                                                  posts[index].postContent ??
+                                                      ""),
                                             )
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                // const SizedBox(
-                                //   width: 82,
-                                // ),
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      onPressed: () {},
-                                      icon: const Icon(Icons.more_horiz),
-                                    ),
-                                    IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(Icons.clear))
-                                  ],
-                                )
-                              ],
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 2),
-                              child: Text(posts[index].postContent ?? ""),
-                            ),
-                            Center(
-                              child: Image.memory(
-                                base64Decode(
-                                  posts[index].image ?? base64Image.imageString,
-                                ),
-                                height: 300,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    const Icon(
-                                      Icons.thumb_up_sharp,
-                                      color: Colors.blue,
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      likesCount.toString(),
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                                // const SizedBox(
-                                //   width: 220,
-                                // ),
-                                const Text("comments")
-                              ],
-                            ),
-                            const Divider(),
-                            Row(
-                              // mainAxisAlignment:
-                              //     MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      likeButtonPressed
-                                          ? IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  likeButtonPressed = true;
-                                                });
-                                              },
-                                              icon: const Icon(
-                                                Icons.thumb_up_alt_sharp,
+                                          : SizedBox(),
+                                      posts[index].image != null
+                                          ? Center(
+                                              child: Image.memory(
+                                                base64Decode(
+                                                  posts[index].image ??
+                                                      base64Image.imageString,
+                                                ),
+                                                height: 300,
+                                                width: double.infinity,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            )
+                                          : SizedBox(),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              const Icon(
+                                                Icons.thumb_up_sharp,
                                                 color: Colors.blue,
-                                              ))
-                                          : IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  likeButtonPressed = false;
-                                                });
-                                              },
-                                              icon: const Icon(
-                                                Icons.thumb_up_alt_sharp,
-                                              )),
-                                      const Text("Like"),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      IconButton(
-                                          onPressed: () {},
-                                          icon: const Icon(Icons.comment)),
-                                      const Text("Comment"),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      IconButton(
-                                          onPressed: () {},
-                                          icon: const Icon(Icons.messenger)),
-                                      const Text("Message")
+                                              ),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              Text(
+                                                likesCount.toString(),
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ],
+                                          ),
+                                          // const SizedBox(
+                                          //   width: 220,
+                                          // ),
+                                          const Text("comments")
+                                        ],
+                                      ),
+                                      const Divider(),
+                                      Row(
+                                        // mainAxisAlignment:
+                                        //     MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Row(
+                                              children: [
+                                                likeButtonPressed
+                                                    ? IconButton(
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            likeButtonPressed =
+                                                                true;
+                                                          });
+                                                        },
+                                                        icon: const Icon(
+                                                          Icons
+                                                              .thumb_up_alt_sharp,
+                                                          color: Colors.blue,
+                                                        ))
+                                                    : IconButton(
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            likeButtonPressed =
+                                                                false;
+                                                          });
+                                                        },
+                                                        icon: const Icon(
+                                                          Icons
+                                                              .thumb_up_alt_sharp,
+                                                        )),
+                                                const Text("Like"),
+                                              ],
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Row(
+                                              children: [
+                                                IconButton(
+                                                    onPressed: () {},
+                                                    icon: const Icon(
+                                                        Icons.comment)),
+                                                const Text("Comment"),
+                                              ],
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Row(
+                                              children: [
+                                                IconButton(
+                                                    onPressed: () {},
+                                                    icon: const Icon(
+                                                        Icons.messenger)),
+                                                const Text("Message")
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      const Divider(),
                                     ],
                                   ),
                                 )
                               ],
                             ),
-                            const Divider(),
-                          ],
-                        ),
-                      ),
-                    );
+                          );
                   },
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

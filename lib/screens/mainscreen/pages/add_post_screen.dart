@@ -62,15 +62,14 @@ class _AddPostPageState extends State<AddPostPage> {
   addPost() async {
     DateTime date = DateTime.now();
     String enteredContent = _feedController.text;
-    if (enteredContent.isNotEmpty) {
-      final post = PostModel(
-          postContent: enteredContent, postDate: date, image: pickedImage);
-      final List<PostModel> existingPosts = await PostManager.getPosts();
-      existingPosts.add(post);
-      await PostManager.savePosts(existingPosts);
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => NewsFeedScreen()));
-    }
+
+    final post = PostModel(
+        postContent: enteredContent, postDate: date, image: pickedImage);
+    final List<PostModel> existingPosts = await PostManager.getPosts();
+    existingPosts.add(post);
+    await PostManager.savePosts(existingPosts);
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => NewsFeedScreen()));
   }
 
   @override

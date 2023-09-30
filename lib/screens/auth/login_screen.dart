@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:social_app/helpers/image_helpers.dart';
 import 'package:social_app/helpers/user_helper.dart';
 import 'package:social_app/models/user_model.dart';
 import 'package:social_app/screens/mainscreen/pages/news_feed_screen.dart';
@@ -35,8 +36,8 @@ class _LoginScreenState extends State<LoginScreen> {
     bool loggedIn = prefs.getBool('loggedIn') ?? false;
 
     if (loggedIn) {
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => NewsFeedScreen()));
+      Navigator.of(context)
+          .pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
     }
   }
 
@@ -50,9 +51,10 @@ class _LoginScreenState extends State<LoginScreen> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setBool('loggedIn', true);
       // log(retrievedUser!.userId);
-
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => NewsFeedScreen()));
+      // _isClicked = true;
+      Future.delayed(Duration(seconds: 1));
+      Navigator.of(context)
+          .pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
     } else {
       //  Invalid credentials
       showDialog(
@@ -91,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 200,
                 ),
                 Image.asset(
-                  "assets/images/logo.png",
+                  ImagePathHelpers.loginLogoPath,
                   height: 100,
                   width: 100,
                 ),
