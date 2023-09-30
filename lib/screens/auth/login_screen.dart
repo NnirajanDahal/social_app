@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,13 +32,29 @@ class _LoginScreenState extends State<LoginScreen> {
   // bool _isUpperCase = false;
   // bool _isOneSpecialCharacter = false;
   // bool _is8charactersLong = false;
+  List<UserModel> usersList = [];
+  UserModel? users;
+
+  loadUsersList() async {
+    final retrievedUser = await SharedPreferencesUserHelper.getUserList();
+    setState(() {
+      usersList = retrievedUser;
+    });
+    if (usersList.isNotEmpty) {
+      for (var i in usersList) {
+        users = i;
+      }
+    }
+    log(users!.email);
+    log(users!.password);
+    log(users!.userId);
+  }
 
   handleLogin() async {
     String enteredUsername = usernameController.text;
     String enteredPassword = passwordController.text;
-    UserModel? retrievedUser = await SharedPreferencesUserHelper.getUserModel();
-    if (enteredUsername == retrievedUser?.email &&
-        enteredPassword == retrievedUser?.password) {
+
+    if (enteredUsername == users!.email && enteredPassword == users!.password) {
       // Successful login
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setBool('loggedIn', true);
@@ -64,11 +81,22 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // @override
-  // void initState() {
-  //   checkLoginStatus();
-  //   super.initState();
-  // }
+  void checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool loggedIn = prefs.getBool('loggedIn') ?? false;
+
+    if (loggedIn) {
+      Navigator.of(context)
+          .pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
+    }
+  }
+
+  @override
+  void initState() {
+    checkLoginStatus();
+    loadUsersList();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

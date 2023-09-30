@@ -11,6 +11,7 @@ import 'package:social_app/screens/auth/login_screen.dart';
 import 'package:uuid/uuid.dart';
 import '../../widgets/widgets.dart';
 
+// 81344443-a0a7-4abd-9839-07321d6098b3
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -33,14 +34,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _isUpperCase = false;
   bool _isOneSpecialCharacter = false;
   bool _is8charactersLong = false;
+  UserModel? users;
+  List<UserModel> addUsers = [];
 
   handleSignUp() async {
     String enteredEmail = usernameController.text;
     String enteredPassword = passwordController.text;
-    final retrievedUser = await SharedPreferencesUserHelper.getUserModel();
-
+    List<UserModel> retrievedUser =
+        await SharedPreferencesUserHelper.getUserList();
+    if (retrievedUser.isNotEmpty) {
+      for (var user in retrievedUser) {
+        users = user;
+      }
+    }
     if (enteredEmail.isNotEmpty && enteredPassword.isNotEmpty) {
-      if (enteredEmail == retrievedUser?.email) {
+      if (enteredEmail == users?.email) {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -68,7 +76,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
           email: enteredEmail,
           password: enteredPassword,
         );
-        SharedPreferencesUserHelper.saveUserModel(user);
+
+        final existingUsers = await SharedPreferencesUserHelper.getUserList();
+
+        existingUsers.add(user);
+        await SharedPreferencesUserHelper.saveUserList(existingUsers);
+
+        log(existingUsers.length.toString());
+        // await SharedPreferencesUserHelper.addUser(user);
         log(user.userId);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             duration: Duration(seconds: 3),
@@ -93,6 +108,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       );
     }
+  }
+
+  checkUsers() {
+    if (addUsers.isNotEmpty) {
+      addUsers.forEach((user) {
+        print(user.email);
+        print(user.password);
+        print(user.userId);
+      });
+    }
+  }
+
+  loadUsers() async {
+    final existingUsers = await SharedPreferencesUserHelper.getUserList();
+    setState(() {
+      addUsers = existingUsers;
+    });
+  }
+
+  @override
+  void initState() {
+    checkUsers();
+    loadUsers();
+    super.initState();
   }
 
   @override
@@ -318,27 +357,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(
                   height: 10,
                 ),
-                ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate() &&
-                          _isUpperCase == true &&
-                          _isLowercase == true &&
-                          _is8charactersLong == true &&
-                          _isOneDigit == true &&
-                          _isOneSpecialCharacter == true) {
-                        handleSignUp();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                backgroundColor: Colors.red,
-                                content: Text("User created successfully")));
-
-                        Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                                builder: (context) => const LoginScreen()));
-                      }
+                Row(
+                  children: [
+                    ElevatedButton(
+                        onPressed: () {
+                          checkUsers();
+                        },
+                        child: Text("Refresh")),
+                    ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate() &&
+                              _isUpperCase == true &&
+                              _isLowercase == true &&
+                              _is8charactersLong == true &&
+                              _isOneDigit == true &&
+                              _isOneSpecialCharacter == true) {
+                            handleSignUp();
+                          }
+                        },
+                        child: const Text("Sign Up")),
+                  ],
+                ),
+                SizedBox(
+                  height: 300,
+                  child: Expanded(
+                      child: ListView.builder(
+                    // shrinkWrap: true,
+                    itemCount: addUsers.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(addUsers[index].email),
+                        subtitle: Text(addUsers[index].password),
+                      );
                     },
-                    child: const Text("Sign Up"))
+                  )),
+                )
               ],
             ),
           ),

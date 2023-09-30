@@ -25,10 +25,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
   List<PostModel> posts = [];
   retrievePosts() async {
     final retrievedPosts = await PostManager.getPosts();
-    final retrievedUser = await SharedPreferencesUserHelper.getUserModel();
-    retrievedUserId = retrievedUser!.userId;
 
-    log(retrievedUser.userId);
     setState(() {
       posts = retrievedPosts;
     });
@@ -292,260 +289,249 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                   // reverse: true,
                   itemCount: posts.length,
                   itemBuilder: (context, index) {
-                    return retrievedUserId != posts[index].postId
-                        ? SizedBox()
-                        :
+                    return
+                        // retrievedUserId != posts[index].postId
+                        //     ? SizedBox()
+                        //     :
                         // posts[index].image == null &&
                         //         posts[index].postContent == null
                         //     ? SizedBox()
                         //     :
                         Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 7),
-                            child: Column(
-                              children: [
-                                Container(
-                                  // height: 550,
-                                  decoration: BoxDecoration(
-                                    color: const Color.fromARGB(
-                                        255, 241, 239, 239),
-                                    // borderRadius: BorderRadius.circular(10),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: const Color.fromARGB(
-                                                255, 182, 178, 178)
-                                            .withOpacity(0.5),
-                                        spreadRadius: 5,
-                                        blurRadius: 7,
-                                        offset: const Offset(0, 3),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              ClipOval(
-                                                child: Image.memory(
-                                                  base64Decode(
-                                                    posts[index].image ??
-                                                        base64Image.imageString,
-                                                  ),
-                                                  height: 50,
-                                                  width: 50,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    posts[index]
-                                                        .postDate
-                                                        .toString(),
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 10),
-                                                  ),
-                                                  const Row(
-                                                    children: [
-                                                      Text("3d "),
-                                                      Icon(
-                                                        Icons.public,
-                                                        size: 15,
-                                                      )
-                                                    ],
-                                                  )
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                          // const SizedBox(
-                                          //   width: 82,
-                                          // ),
-                                          Row(
-                                            children: [
-                                              IconButton(
-                                                onPressed: () {},
-                                                icon: const Icon(
-                                                    Icons.more_horiz),
-                                              ),
-                                              IconButton(
-                                                  onPressed: () {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder: (context) =>
-                                                          AlertDialog(
-                                                        title: Text('ALERT!'),
-                                                        content: Text(
-                                                            'Sure want to delete?'),
-                                                        actions: <Widget>[
-                                                          TextButton(
-                                                            onPressed: () =>
-                                                                Navigator.pop(
-                                                                    context),
-                                                            child: Text('No'),
-                                                          ),
-                                                          TextButton(
-                                                            onPressed: () {
-                                                              deletePost(index);
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            child: Text('Yes'),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  },
-                                                  icon: const Icon(Icons.clear))
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                      posts[index].postContent != null
-                                          ? Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 2),
-                                              child: Text(
-                                                  posts[index].postContent ??
-                                                      ""),
-                                            )
-                                          : SizedBox(),
-                                      posts[index].postId != null
-                                          ? Text(posts[index].postId.toString())
-                                          : SizedBox(),
-                                      posts[index].image != null
-                                          ? Center(
-                                              child: Image.memory(
-                                                base64Decode(
-                                                  posts[index].image ??
-                                                      base64Image.imageString,
-                                                ),
-                                                height: 300,
-                                                width: double.infinity,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            )
-                                          : SizedBox(),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              const Icon(
-                                                Icons.thumb_up_sharp,
-                                                color: Colors.blue,
-                                              ),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              // posts[index].likes != null
-                                              // ?
-                                              Text(
-                                                totalLikes.toString(),
-                                                style: const TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              )
-                                              // : Text("0"),
-                                            ],
-                                          ),
-                                          // const SizedBox(
-                                          //   width: 220,
-                                          // ),
-                                          const Text("comments")
-                                        ],
-                                      ),
-                                      const Divider(),
-                                      Row(
-                                        // mainAxisAlignment:
-                                        //     MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: Row(
-                                              children: [
-                                                // likeButtonPressed?
-                                                IconButton(
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        likeButtonPressed =
-                                                            likeButtonPressed
-                                                                ? false
-                                                                : true;
-                                                      });
-                                                      if (likeButtonPressed ==
-                                                          true) {
-                                                        setState(() {
-                                                          incrementLikes();
-                                                        });
-                                                      } else {
-                                                        setState(() {
-                                                          decrementLike();
-                                                        });
-                                                      }
-                                                      // PostLikesHelper()
-                                                      //     .incrementLike;
-                                                    },
-                                                    icon: Icon(
-                                                      Icons.thumb_up_alt_sharp,
-                                                      color: likeButtonPressed
-                                                          ? Colors.blue
-                                                          : Colors.black,
-                                                    )),
-                                                Text("Like"),
-                                              ],
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Row(
-                                              children: [
-                                                IconButton(
-                                                    onPressed: () {},
-                                                    icon: const Icon(
-                                                        Icons.comment)),
-                                                const Text("Comment"),
-                                              ],
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Row(
-                                              children: [
-                                                IconButton(
-                                                    onPressed: () {},
-                                                    icon: const Icon(
-                                                        Icons.messenger)),
-                                                const Text("Message")
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                      const Divider(),
-                                    ],
-                                  ),
-                                )
+                      padding: const EdgeInsets.symmetric(horizontal: 7),
+                      child: Column(
+                        children: [
+                          Container(
+                            // height: 550,
+                            decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 241, 239, 239),
+                              // borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color:
+                                      const Color.fromARGB(255, 182, 178, 178)
+                                          .withOpacity(0.5),
+                                  spreadRadius: 5,
+                                  blurRadius: 7,
+                                  offset: const Offset(0, 3),
+                                ),
                               ],
                             ),
-                          );
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        ClipOval(
+                                          child: Image.memory(
+                                            base64Decode(
+                                              posts[index].image ??
+                                                  base64Image.imageString,
+                                            ),
+                                            height: 50,
+                                            width: 50,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              posts[index].postDate.toString(),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 10),
+                                            ),
+                                            const Row(
+                                              children: [
+                                                Text("3d "),
+                                                Icon(
+                                                  Icons.public,
+                                                  size: 15,
+                                                )
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    // const SizedBox(
+                                    //   width: 82,
+                                    // ),
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          onPressed: () {},
+                                          icon: const Icon(Icons.more_horiz),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (context) =>
+                                                    AlertDialog(
+                                                  title: Text('ALERT!'),
+                                                  content: Text(
+                                                      'Sure want to delete?'),
+                                                  actions: <Widget>[
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.pop(
+                                                              context),
+                                                      child: Text('No'),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        deletePost(index);
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text('Yes'),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                            icon: const Icon(Icons.clear))
+                                      ],
+                                    )
+                                  ],
+                                ),
+                                posts[index].postContent != null
+                                    ? Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 2),
+                                        child: Text(
+                                            posts[index].postContent ?? ""),
+                                      )
+                                    : SizedBox(),
+                                posts[index].postId != null
+                                    ? Text(posts[index].postId.toString())
+                                    : SizedBox(),
+                                posts[index].image != null
+                                    ? Center(
+                                        child: Image.memory(
+                                          base64Decode(
+                                            posts[index].image ??
+                                                base64Image.imageString,
+                                          ),
+                                          height: 300,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
+                                    : SizedBox(),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        const Icon(
+                                          Icons.thumb_up_sharp,
+                                          color: Colors.blue,
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        // posts[index].likes != null
+                                        // ?
+                                        Text(
+                                          totalLikes.toString(),
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        )
+                                        // : Text("0"),
+                                      ],
+                                    ),
+                                    // const SizedBox(
+                                    //   width: 220,
+                                    // ),
+                                    const Text("comments")
+                                  ],
+                                ),
+                                const Divider(),
+                                Row(
+                                  // mainAxisAlignment:
+                                  //     MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          // likeButtonPressed?
+                                          IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  likeButtonPressed =
+                                                      likeButtonPressed
+                                                          ? false
+                                                          : true;
+                                                });
+                                                if (likeButtonPressed == true) {
+                                                  setState(() {
+                                                    incrementLikes();
+                                                  });
+                                                } else {
+                                                  setState(() {
+                                                    decrementLike();
+                                                  });
+                                                }
+                                                // PostLikesHelper()
+                                                //     .incrementLike;
+                                              },
+                                              icon: Icon(
+                                                Icons.thumb_up_alt_sharp,
+                                                color: likeButtonPressed
+                                                    ? Colors.blue
+                                                    : Colors.black,
+                                              )),
+                                          Text("Like"),
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          IconButton(
+                                              onPressed: () {},
+                                              icon: const Icon(Icons.comment)),
+                                          const Text("Comment"),
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          IconButton(
+                                              onPressed: () {},
+                                              icon:
+                                                  const Icon(Icons.messenger)),
+                                          const Text("Message")
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                const Divider(),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    );
                   },
                 ),
               ),

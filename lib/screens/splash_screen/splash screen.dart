@@ -17,21 +17,11 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     Timer(Duration(seconds: 3), () {
-      checkLoginStatus();
-      // Navigator.pushReplacement(
-      //     context, CupertinoPageRoute(builder: (context) => LoginScreen()));
+      // checkLoginStatus();
+      Navigator.pushReplacement(
+          context, CupertinoPageRoute(builder: (context) => LoginScreen()));
     });
     super.initState();
-  }
-
-  void checkLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool loggedIn = prefs.getBool('loggedIn') ?? false;
-
-    if (loggedIn) {
-      Navigator.of(context)
-          .pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
-    }
   }
 
   @override

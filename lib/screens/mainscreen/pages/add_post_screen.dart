@@ -68,20 +68,20 @@ class _AddPostPageState extends State<AddPostPage> {
   addPost() async {
     DateTime date = DateTime.now();
     String enteredContent = _feedController.text;
-    final retrievedUser = await SharedPreferencesUserHelper.getUserModel();
-    final pId = retrievedUser?.userId;
+    final retrievedUser = await SharedPreferencesUserHelper.getUserList();
+    final pId = retrievedUser[0].userId;
     final post = PostModel(
-        postId: pId!,
+        postId: pId,
         postContent: enteredContent,
         postDate: date,
         image: pickedImage,
         likes: widget.likes);
-    log(post.postId.toString());
-    print(retrievedUser?.userId);
+    // log(post.postId.toString());
+    // print(retrievedUser[0].userId);
     final List<PostModel> existingPosts = await PostManager.getPosts();
     existingPosts.add(post);
     await PostManager.savePosts(existingPosts);
-
+    log(existingPosts.length.toString());
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => HomePage()));
   }
