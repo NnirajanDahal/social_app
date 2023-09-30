@@ -1,5 +1,4 @@
 class UserDetailModel {
-  final String userId;
   final String name;
   final String age;
   final String DOB;
@@ -9,8 +8,7 @@ class UserDetailModel {
   final String? coverImage;
 
   UserDetailModel(
-      {required this.userId,
-      required this.name,
+      {required this.name,
       required this.age,
       required this.DOB,
       required this.contact,
@@ -27,13 +25,11 @@ class UserDetailModel {
       'education': education,
       'profileImage': profileImage,
       'coverImage': coverImage,
-      'userId': userId,
     };
   }
 
   factory UserDetailModel.fromJson(Map<String, dynamic> json) {
     return UserDetailModel(
-        userId: json['userId'],
         name: json['name'],
         age: json['age'],
         DOB: json['DOB'],

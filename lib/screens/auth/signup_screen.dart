@@ -37,7 +37,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   handleSignUp() async {
     String enteredEmail = usernameController.text;
     String enteredPassword = passwordController.text;
-    UserModel? retrievedUser = await SharedPreferencesUserHelper.getUserModel();
+    final retrievedUser = await SharedPreferencesUserHelper.getUserModel();
 
     if (enteredEmail.isNotEmpty && enteredPassword.isNotEmpty) {
       if (enteredEmail == retrievedUser?.email) {

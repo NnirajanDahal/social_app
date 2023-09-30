@@ -1,14 +1,20 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:social_app/helpers/post_helper.dart';
+import 'package:social_app/helpers/post_likes_helper.dart';
+import 'package:social_app/helpers/user_helper.dart';
 import 'package:social_app/models/post_model.dart';
+import 'package:social_app/models/user_model.dart';
+import 'package:social_app/screens/mainscreen/home_screen.dart';
 import 'package:social_app/screens/mainscreen/pages/news_feed_screen.dart';
 
 class AddPostPage extends StatefulWidget {
-  const AddPostPage({super.key});
+  final int? likes;
+  const AddPostPage({super.key, this.likes});
 
   @override
   State<AddPostPage> createState() => _AddPostPageState();
@@ -62,14 +68,22 @@ class _AddPostPageState extends State<AddPostPage> {
   addPost() async {
     DateTime date = DateTime.now();
     String enteredContent = _feedController.text;
-
+    final retrievedUser = await SharedPreferencesUserHelper.getUserModel();
+    final pId = retrievedUser?.userId;
     final post = PostModel(
-        postContent: enteredContent, postDate: date, image: pickedImage);
+        postId: pId!,
+        postContent: enteredContent,
+        postDate: date,
+        image: pickedImage,
+        likes: widget.likes);
+    log(post.postId.toString());
+    print(retrievedUser?.userId);
     final List<PostModel> existingPosts = await PostManager.getPosts();
     existingPosts.add(post);
     await PostManager.savePosts(existingPosts);
+
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => NewsFeedScreen()));
+        context, MaterialPageRoute(builder: (context) => HomePage()));
   }
 
   @override

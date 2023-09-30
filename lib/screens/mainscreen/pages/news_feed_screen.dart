@@ -1,16 +1,16 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:social_app/functions/functions.dart';
 import 'package:social_app/helpers/base64Convert.dart';
 import 'package:social_app/helpers/post_helper.dart';
+import 'package:social_app/helpers/post_likes_helper.dart';
+import 'package:social_app/helpers/user_helper.dart';
 import 'package:social_app/models/post_model.dart';
 import 'package:social_app/screens/auth/login_screen.dart';
 import 'package:social_app/screens/mainscreen/pages/add_post_screen.dart';
-
-import '../../../network_images/network_image.dart';
 
 class NewsFeedScreen extends StatefulWidget {
   const NewsFeedScreen({super.key});
@@ -21,11 +21,14 @@ class NewsFeedScreen extends StatefulWidget {
 
 class _NewsFeedScreenState extends State<NewsFeedScreen> {
   bool likeButtonPressed = false;
-
+  String retrievedUserId = "";
   List<PostModel> posts = [];
   retrievePosts() async {
     final retrievedPosts = await PostManager.getPosts();
+    final retrievedUser = await SharedPreferencesUserHelper.getUserModel();
+    retrievedUserId = retrievedUser!.userId;
 
+    log(retrievedUser.userId);
     setState(() {
       posts = retrievedPosts;
     });
@@ -47,6 +50,15 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
     await prefs.setBool('loggedIn', false);
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => LoginScreen()));
+  }
+
+  int totalLikes = 0;
+  void incrementLikes() {
+    totalLikes++;
+  }
+
+  void decrementLike() {
+    totalLikes--;
   }
 
   @override
@@ -131,7 +143,9 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                     Navigator.push(
                         context,
                         CupertinoPageRoute(
-                            builder: (context) => const AddPostPage()));
+                            builder: (context) => AddPostPage(
+                                  likes: totalLikes,
+                                )));
                   },
                   child: Expanded(
                       child: Container(
@@ -275,12 +289,17 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
               height: 600,
               child: Expanded(
                 child: ListView.builder(
+                  // reverse: true,
                   itemCount: posts.length,
                   itemBuilder: (context, index) {
-                    return posts[index].image == null &&
-                            posts[index].postContent == null
+                    return retrievedUserId != posts[index].postId
                         ? SizedBox()
-                        : Padding(
+                        :
+                        // posts[index].image == null &&
+                        //         posts[index].postContent == null
+                        //     ? SizedBox()
+                        //     :
+                        Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 7),
                             child: Column(
                               children: [
@@ -404,6 +423,9 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                                                       ""),
                                             )
                                           : SizedBox(),
+                                      posts[index].postId != null
+                                          ? Text(posts[index].postId.toString())
+                                          : SizedBox(),
                                       posts[index].image != null
                                           ? Center(
                                               child: Image.memory(
@@ -436,12 +458,15 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                                               const SizedBox(
                                                 width: 10,
                                               ),
+                                              // posts[index].likes != null
+                                              // ?
                                               Text(
-                                                likesCount.toString(),
+                                                totalLikes.toString(),
                                                 style: const TextStyle(
                                                     fontWeight:
                                                         FontWeight.bold),
-                                              ),
+                                              )
+                                              // : Text("0"),
                                             ],
                                           ),
                                           // const SizedBox(
@@ -458,31 +483,35 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                                           Expanded(
                                             child: Row(
                                               children: [
-                                                likeButtonPressed
-                                                    ? IconButton(
-                                                        onPressed: () {
-                                                          setState(() {
-                                                            likeButtonPressed =
-                                                                true;
-                                                          });
-                                                        },
-                                                        icon: const Icon(
-                                                          Icons
-                                                              .thumb_up_alt_sharp,
-                                                          color: Colors.blue,
-                                                        ))
-                                                    : IconButton(
-                                                        onPressed: () {
-                                                          setState(() {
-                                                            likeButtonPressed =
-                                                                false;
-                                                          });
-                                                        },
-                                                        icon: const Icon(
-                                                          Icons
-                                                              .thumb_up_alt_sharp,
-                                                        )),
-                                                const Text("Like"),
+                                                // likeButtonPressed?
+                                                IconButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        likeButtonPressed =
+                                                            likeButtonPressed
+                                                                ? false
+                                                                : true;
+                                                      });
+                                                      if (likeButtonPressed ==
+                                                          true) {
+                                                        setState(() {
+                                                          incrementLikes();
+                                                        });
+                                                      } else {
+                                                        setState(() {
+                                                          decrementLike();
+                                                        });
+                                                      }
+                                                      // PostLikesHelper()
+                                                      //     .incrementLike;
+                                                    },
+                                                    icon: Icon(
+                                                      Icons.thumb_up_alt_sharp,
+                                                      color: likeButtonPressed
+                                                          ? Colors.blue
+                                                          : Colors.black,
+                                                    )),
+                                                Text("Like"),
                                               ],
                                             ),
                                           ),

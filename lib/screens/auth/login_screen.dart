@@ -31,15 +31,6 @@ class _LoginScreenState extends State<LoginScreen> {
   // bool _isUpperCase = false;
   // bool _isOneSpecialCharacter = false;
   // bool _is8charactersLong = false;
-  void checkLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool loggedIn = prefs.getBool('loggedIn') ?? false;
-
-    if (loggedIn) {
-      Navigator.of(context)
-          .pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
-    }
-  }
 
   handleLogin() async {
     String enteredUsername = usernameController.text;
@@ -73,11 +64,11 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  @override
-  void initState() {
-    checkLoginStatus();
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   checkLoginStatus();
+  //   super.initState();
+  // }
 
   @override
   Widget build(BuildContext context) {
